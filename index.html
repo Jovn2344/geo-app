@@ -7,12 +7,26 @@
   <style>
     body {
       font-family: system-ui, sans-serif;
-      margin: 2rem;
+      margin: 0;
       height: 100vh;
-      background: url("https://picsum.photos/1920/1080?blur=3") no-repeat center center fixed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+
+      background: url("Thank you For Participating Godspeed_page-0001.jpg") no-repeat center center fixed;
       background-size: cover;
+
       color: #fff;
       text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    }
+
+    .card {
+      background: rgba(0,0,0,0.6);
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
     }
 
     button {
@@ -21,6 +35,7 @@
       border-radius: 6px;
       cursor: pointer;
       font-weight: bold;
+      margin: 0.25rem;
     }
 
     .primary { background: #2563eb; color: white; }
@@ -36,23 +51,25 @@
   </style>
 </head>
 <body>
-  <h1>Share Your Location</h1>
-  <p>
-    If you agree, this page will collect your approximate location using your browser’s
-    <code>navigator.geolocation</code> and send it securely to the site admin.
-    Your coordinates will <strong>not</strong> be displayed here.
-  </p>
+  <div class="card">
+    <h1>Share Your Location</h1>
+    <p>
+      If you agree, this page will collect your approximate location using your browser’s
+      <code>navigator.geolocation</code> and send it securely to the site admin.
+      Your coordinates will <strong>not</strong> be displayed here.
+    </p>
 
-  <label>
-    <input type="checkbox" id="agree">
-    I consent to sharing my location with the site admin
-  </label>
-  <br><br>
+    <label>
+      <input type="checkbox" id="agree">
+      I consent to sharing my location with the site admin
+    </label>
+    <br><br>
 
-  <button id="share" class="primary">Share Location</button>
-  <button id="skip" class="ghost">No Thanks</button>
+    <button id="share" class="primary">Share Location</button>
+    <button id="skip" class="ghost">No Thanks</button>
 
-  <p id="status"></p>
+    <p id="status"></p>
+  </div>
 
   <script>
     const statusEl = document.getElementById('status');
