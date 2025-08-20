@@ -5,13 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Share Location</title>
   <style>
-    body { font-family: system-ui, sans-serif; margin: 2rem; }
-    button { padding: 0.75rem 1rem; border: none; border-radius: 6px; cursor: pointer; }
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 2rem;
+      height: 100vh;
+      background: url("https://picsum.photos/1920/1080?blur=3") no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    }
+
+    button {
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
     .primary { background: #2563eb; color: white; }
-    .ghost { background: #eee; }
-    #status { margin-top: 1rem; font-size: 0.9rem; }
-    .ok { color: green; }
-    .err { color: red; }
+    .ghost { background: rgba(255,255,255,0.7); color: #000; }
+
+    #status { 
+      margin-top: 1rem; 
+      font-size: 0.9rem; 
+    }
+
+    .ok { color: #00ff88; }
+    .err { color: #ff5555; }
   </style>
 </head>
 <body>
