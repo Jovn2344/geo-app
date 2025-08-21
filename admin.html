@@ -1,62 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin – Collected Locations</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Location Logs</title>
   <style>
-    body { font-family: system-ui, sans-serif; margin: 2rem; }
-    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
-    th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
-    th { background: #f3f3f3; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background: #f0f0f0;
+    }
+    tr:hover {
+      background: #e9f5ff;
+    }
   </style>
 </head>
 <body>
-  <h1>Collected Locations</h1>
-  <button id="refresh">Refresh Data</button>
-  <table>
+  <h1>📍 Location Logs</h1>
+
+  <table id="logsTable">
     <thead>
       <tr>
-        <th>Time</th>
+        <th>ID</th>
         <th>Latitude</th>
         <th>Longitude</th>
-        <th>Accuracy (m)</th>
-        <th>IP</th>
+        <th>Accuracy</th>
+        <th>Time</th>
         <th>User Agent</th>
+        <th>IP</th>
       </tr>
     </thead>
-    <tbody id="table-body"></tbody>
+    <tbody></tbody>
   </table>
 
   <script>
-    const tbody = document.getElementById('table-body');
-    const refreshBtn = document.getElementById('refresh');
-
-    async function loadData() {
-      tbody.innerHTML = '<tr><td colspan="6">Loading…</td></tr>';
+    async function loadLogs() {
       try {
-        const res = await fetch('/api/locations');
+        const res = await fetch("/api/locations");
         const data = await res.json();
-        tbody.innerHTML = '';
-        data.forEach(loc => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${loc.at}</td>
-            <td>${loc.lat}</td>
-            <td>${loc.lon}</td>
-            <td>${loc.accuracy ?? '-'}</td>
-            <td>${loc.ip ?? '-'}</td>
-            <td>${loc.ua ?? '-'}</td>
+
+        const tbody = document.querySelector("#logsTable tbody");
+        tbody.innerHTML = "";
+
+        data.forEach(log => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${log.id}</td>
+            <td>${log.lat ?? ""}</td>
+            <td>${log.lon ?? ""}</td>
+            <td>${log.accuracy ?? ""}</td>
+            <td>${log.at}</td>
+            <td>${log.ua ?? ""}</td>
+            <td>${log.ip ?? ""}</td>
           `;
-          tbody.appendChild(row);
+          tbody.appendChild(tr);
         });
       } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="6">Failed to load data.</td></tr>';
+        console.error("Failed to load logs:", err);
       }
     }
 
-    refreshBtn.addEventListener('click', loadData);
-    loadData();
+    loadLogs();
+    setInterval(loadLogs, 5000); // auto-refresh every 5s
   </script>
 </body>
 </html>
+
+
