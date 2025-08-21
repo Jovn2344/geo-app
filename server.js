@@ -1,7 +1,7 @@
 import express from "express";
-import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { Pool } from "pg";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -9,48 +9,41 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Postgres connection
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false } // required on Render
+});
+
 app.use(express.json());
-app.use(express.static(__dirname)); // Serves index.html, admin.html
+app.use(express.static(__dirname)); // serves index.html, admin.html, etc.
 
-const DB = path.join(__dirname, "locations.log");
-
-// POST: Save a new location
-app.post("/api/locations", (req, res) => {
+// POST: Save location
+app.post("/api/locations", async (req, res) => {
   const { lat, lon, accuracy, at, ua } = req.body || {};
-  if (typeof lat !== "number" || typeof lon !== "number") {
-    return res.status(400).json({ ok: false, error: "Invalid lat/lon" });
-  }
-
-  const record = {
-    lat,
-    lon,
-    accuracy: typeof accuracy === "number" ? accuracy : null,
-    at: at || new Date().toISOString(),
-    ua: ua || null,
-    ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress || null,
-  };
+  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || null;
 
   try {
-    fs.appendFileSync(DB, JSON.stringify(record) + "\n", "utf8");
-    console.log("Saved location:", record);
+    await pool.query(
+      "INSERT INTO locations (lat, lon, accuracy, at, ua, ip) VALUES ($1,$2,$3,$4,$5,$6)",
+      [lat, lon, accuracy, at || new Date().toISOString(), ua, ip]
+    );
     res.json({ ok: true });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ ok: false, error: "Failed to persist" });
+  } catch (err) {
+    console.error("Insert error:", err);
+    res.status(500).json({ ok: false });
   }
 });
 
-// GET: Fetch all stored locations
-app.get("/api/locations", (req, res) => {
+// GET: Fetch logs
+app.get("/api/locations", async (req, res) => {
   try {
-    if (!fs.existsSync(DB)) return res.json([]);
-    const lines = fs.readFileSync(DB, "utf8").trim().split("\n");
-    const records = lines.map(line => JSON.parse(line));
-    res.json(records);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ ok: false, error: "Failed to load" });
+    const { rows } = await pool.query("SELECT * FROM locations ORDER BY at DESC");
+    res.json(rows);
+  } catch (err) {
+    console.error("Fetch error:", err);
+    res.status(500).json({ ok: false });
   }
 });
 
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
